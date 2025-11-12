@@ -1,0 +1,76 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Soccer Tactics Analysis Backend
+
+Globals:
+  Function:
+    # Extended to ensure long-running Gemini calls can finish
+    Timeout: 60
+    MemorySize: 512
+    Runtime: nodejs20.x
+    Architectures:
+      - x86_64
+    Environment:
+      Variables:
+        NODE_ENV: production
+
+Parameters:
+  GeminiApiKey:
+    Type: String
+    Description: Gemini API Key
+    NoEcho: true
+
+Resources:
+  TacticLensApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      Cors:
+        AllowMethods: "'POST, OPTIONS'"
+        AllowHeaders: "'Content-Type'"
+        AllowOrigin: "'*'"
+
+  AnalyzeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: tactic-lens-analyzer
+      CodeUri: ./
+      Handler: dist/index.handler
+      Description: Analyze soccer tactics using Gemini API
+      Environment:
+        Variables:
+          GEMINI_API_KEY: !Ref GeminiApiKey
+      Events:
+        AnalyzeApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TacticLensApi
+            Path: /api/analyze
+            Method: POST
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: false
+        Target: es2022
+        Sourcemap: true
+        EntryPoints:
+          - src/index.ts
+
+  AnalyzeFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${AnalyzeFunction}
+      RetentionInDays: 7
+
+Outputs:
+  ApiEndpoint:
+    Description: API Gateway endpoint URL
+    Value: !Sub 'https://${TacticLensApi}.execute-api.${AWS::Region}.amazonaws.com/prod/api/analyze'
+
+  FunctionArn:
+    Description: Lambda Function ARN
+    Value: !GetAtt AnalyzeFunction.Arn
+
+  FunctionName:
+    Description: Lambda Function Name
+    Value: !Ref AnalyzeFunction

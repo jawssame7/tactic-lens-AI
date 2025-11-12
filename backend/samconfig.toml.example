@@ -1,0 +1,16 @@
+version = 0.1
+
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "tactic-lens-backend"
+s3_prefix = "tactic-lens-backend"
+region = "ap-northeast-1"
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "GeminiApiKey=\"YOUR_GEMINI_API_KEY_HERE\""
+image_repositories = []
+
+[default.build]
+[default.build.parameters]
+cached = true
+parallel = true

@@ -1,0 +1,41 @@
+{
+  "name": "tactic-lens-ai-backend",
+  "version": "1.0.0",
+  "description": "Soccer tactics analysis backend for AWS Lambda",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint --write .",
+    "format": "biome format --write .",
+    "check": "biome check --write .",
+    "sam:build": "sam build",
+    "sam:deploy": "sam deploy --guided",
+    "sam:deploy:prod": "sam deploy",
+    "sam:local": "sam local start-api --env-vars env.json --port 3100",
+    "sam:logs": "sam logs -n AnalyzeFunction --stack-name tactic-lens-backend --tail",
+    "sam:delete": "sam delete",
+    "zip": "npm run build && cd dist && zip -r ../lambda.zip ."
+  },
+  "keywords": [
+    "lambda",
+    "gemini",
+    "soccer",
+    "tactics"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.3.4",
+    "@types/aws-lambda": "^8.10.145",
+    "@types/node": "^20.14.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.0"
+  }
+}

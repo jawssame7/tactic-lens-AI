@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm create:*)",
+      "Bash(npm install:*)",
+      "Bash(npx tailwindcss:*)",
+      "Bash(tree:*)",
+      "Bash(npm run check:*)",
+      "Bash(npm run lint)",
+      "Bash(npm run lint:fix:*)",
+      "Bash(npx biome check:*)",
+      "Bash(npm run build:*)",
+      "Bash(lsof:*)",
+      "Bash(xargs kill -9)",
+      "Bash(cd:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
