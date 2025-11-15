@@ -1,6 +1,19 @@
+import { readFileSync } from 'fs';
+import { join } from 'path';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import type { Part } from '@google/generative-ai';
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+
+// Load environment variables from JSON file in development
+if (process.env.NODE_ENV !== 'production') {
+  try {
+    const envPath = join(process.cwd(), 'env.local.json');
+    const envConfig = JSON.parse(readFileSync(envPath, 'utf-8'));
+    Object.assign(process.env, envConfig);
+  } catch (error) {
+    // Ignore if file doesn't exist (e.g., in Lambda environment)
+  }
+}
 
 // Types
 interface AnalyzeRequest {

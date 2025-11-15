@@ -31,63 +31,73 @@ AWS SAMを使用したバックエンドのデプロイ方法です。
    # Default output format: json
    ```
 
+4. **環境変数の設定**
+   ```bash
+   # env.example.jsonをコピーしてenv.local.jsonを作成
+   cp env.example.json env.local.json
+
+   # env.local.jsonを編集してAPIキーを設定
+   # GEMINI_API_KEYに実際のAPIキーを入力
+   ```
+
 ## 初回デプロイ
 
-### 1. Gemini APIキーの準備
-
-[Google AI Studio](https://makersuite.google.com/app/apikey)でAPIキーを取得してください。
-
-### 2. ビルド
+### 1. 環境変数ファイルの準備
 
 ```bash
-cd backend
-npm run sam:build
+# env.example.jsonをコピー
+cp env.example.json env.local.json
+
+# env.local.jsonを編集してGemini APIキーを設定
+# GEMINI_API_KEYの値を実際のAPIキーに置き換える
 ```
 
-このコマンドは以下を実行します:
-- TypeScriptのコンパイル
-- 依存関係のインストール
-- Lambda関数のパッケージング
+Gemini APIキーは[Google AI Studio](https://makersuite.google.com/app/apikey)で取得できます。
 
-### 3. 初回デプロイ（ガイド付き）
+### 2. ビルドとデプロイ（自動スクリプト使用）
 
 ```bash
+# deploy.shスクリプトを使用（推奨）
+./deploy.sh
+```
+
+このスクリプトは以下を自動実行します:
+
+- env.local.jsonからenv.jsonを生成
+- TypeScriptのビルド
+- SAMビルド
+- AWSへのデプロイ
+
+### 3. 手動ビルド（オプション）
+
+手動でビルド・デプロイする場合:
+
+```bash
+npm run build
+npm run sam:build
 npm run sam:deploy
 ```
 
-以下の質問に答えます:
+初回デプロイ時は以下の質問に答えます:
 
-```
-Stack Name [tactic-lens-backend]: Enter（デフォルトのまま）
-AWS Region [ap-northeast-1]: Enter（デフォルトのまま）
-Parameter GeminiApiKey []: YOUR_GEMINI_API_KEY（取得したAPIキーを入力）
-Confirm changes before deploy [Y/n]: Y
-Allow SAM CLI IAM role creation [Y/n]: Y
-Disable rollback [y/N]: N
-Save arguments to configuration file [Y/n]: Y
-SAM configuration file [samconfig.toml]: Enter
-SAM configuration environment [default]: Enter
-```
+- Stack Name: `tactic-lens-backend` (デフォルトのまま)
+- AWS Region: `ap-northeast-1` (デフォルトのまま)
+- Parameter GeminiApiKey: `env.local.json`に設定したAPIキーを入力
+- その他: デフォルトのままEnterを押す
 
-デプロイが完了すると、API Endpointが表示されます:
-
-```
-Outputs
--------------------------------------------------------
-Key                 ApiEndpoint
-Description         API Gateway endpoint URL
-Value               https://xxxxx.execute-api.ap-northeast-1.amazonaws.com/prod/api/analyze
-```
+デプロイが完了すると、API Endpointが表示されます。
 
 ## 2回目以降のデプロイ
 
 設定が保存されているので、簡単にデプロイできます:
 
 ```bash
-# ビルド
-npm run sam:build
+# deploy.shスクリプトを使用（推奨）
+./deploy.sh
 
-# デプロイ
+# または手動で
+npm run build
+npm run sam:build
 npm run sam:deploy:prod
 ```
 
@@ -147,8 +157,12 @@ aws s3 mb s3://sam-deploy-tactic-lens-backend-{RANDOM_STRING}
 
 ### APIキーの更新
 
+`env.local.json`のAPIキーを更新してから再デプロイ:
+
 ```bash
-sam deploy --parameter-overrides GeminiApiKey=NEW_API_KEY
+# env.local.jsonを編集してAPIキーを更新
+# その後、deploy.shを実行
+./deploy.sh
 ```
 
 ## フロントエンドの設定
